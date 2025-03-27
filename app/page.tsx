@@ -4,9 +4,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import {  Container} from '@mantine/core'
 import { ActionIcon, Slider, Group, Text, rem, Button, Divider ,TextInput, useMantineTheme, Anchor} from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
-import { IconPlayerPlay, IconPlayerPause, IconZoomIn, IconZoomOut, IconScissors, IconDownload ,IconCloudCancel, IconX, IconCloudUpload} from "@tabler/icons-react";
+import {  IconZoomIn, IconZoomOut, IconScissors, IconDownload ,IconCloudCancel, IconX, IconCloudUpload} from "@tabler/icons-react";
 
-import { IconEyeOff, IconArrowBack, IconArrowForward, IconSearch, IconHelpCircle } from "@tabler/icons-react";
+import {  IconArrowBack, IconArrowForward, IconSearch, IconHelpCircle } from "@tabler/icons-react";
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import classes from './DropzoneButton.module.css';
 
@@ -37,8 +37,12 @@ const VideoEditor = () => {
   const mediaRef = useRef(null);
   const canvasRef = useRef(null);
   const timerRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const videoRef = useRef(null)
+
+  useEffect(()=>{
+    console.log(isResizing)
+    console.log(resizeDirection);
+  })
+  
 
   // Handle file upload
   //@ts-ignore
@@ -561,7 +565,7 @@ const VideoEditor = () => {
               )}
 
               {/* Resize Handles */}
-              
+
               {[
                 'top-left', 'top-right', 
                 'bottom-left', 'bottom-right'
