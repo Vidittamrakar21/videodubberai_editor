@@ -13,8 +13,8 @@ const VideoEditor = () => {
   const [mediaType, setMediaType] = useState(null);
   
   // State for positioning and sizing
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [size, setSize] = useState({ width: 400, height: 300 });
+  const [position, setPosition] = useState({ x: 406, y: 140 });
+  const [size, setSize] = useState({ width: 360, height: 220 });
   
   // State for resizing
   const [isResizing, setIsResizing] = useState(false);
@@ -82,6 +82,7 @@ const VideoEditor = () => {
         });
       }, 1000);
     }
+  
   };
 
   // Stop playback
@@ -180,6 +181,7 @@ const VideoEditor = () => {
       newHeight = Math.max(50, newHeight);
 
       setSize({ width: newWidth, height: newHeight });
+      
       setPosition({ x: newLeft, y: newTop });
     };
 
@@ -295,7 +297,7 @@ const VideoEditor = () => {
       {/* Canvas */}
       <div 
         ref={canvasRef}
-        className="w-3/4 h-[600px] bg-[black] relative border-2 border-gray-200"
+        className="w-[60%] h-[600px] bg-[black] relative border-2 border-gray-200"
       >
         {mediaFile && (
           <div

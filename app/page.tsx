@@ -1,11 +1,14 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Upload } from 'lucide-react';
+import {  Container} from '@mantine/core'
+import { ActionIcon, Slider, Group, Text, rem, Button, Divider ,TextInput, useMantineTheme, Anchor} from "@mantine/core";
+import { IconClock } from "@tabler/icons-react";
+import { IconPlayerPlay, IconPlayerPause, IconZoomIn, IconZoomOut, IconScissors, IconDownload ,IconCloudCancel, IconX, IconCloudUpload} from "@tabler/icons-react";
+
+import { IconEyeOff, IconArrowBack, IconArrowForward, IconSearch, IconHelpCircle } from "@tabler/icons-react";
+import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
+import classes from './DropzoneButton.module.css';
 
 const VideoEditor = () => {
   // State for media file
@@ -26,7 +29,9 @@ const VideoEditor = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [medialoaded, setmedialoaded] = useState(false);
-  const [videoplay, setvideoplay] = useState(false);
+  const [onresize, setonresize] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(30);
+
 
   // Refs
   const mediaRef = useRef(null);
@@ -37,8 +42,8 @@ const VideoEditor = () => {
 
   // Handle file upload
   //@ts-ignore
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = (file) => {
+    
     if (file) {
       const fileType = file.type.startsWith('video/') ? 'video' : 
                        file.type.startsWith('image/') ? 'image' : null;
@@ -77,10 +82,10 @@ const VideoEditor = () => {
             return 0;
           }
           
-          return prev + 1;
+          return  prev + 0.1;
 
         });
-      }, 1000);
+      }, 100);
     }
   
   };
@@ -196,108 +201,320 @@ const VideoEditor = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+
+  const duration = (endTime - startTime).toString(); 
+
+  
+
+  const openRef = useRef<() => void>(null);
+  const theme = useMantineTheme();
+
   return (
-    <div className="flex">
+    
+    <div className="flex bg-[#F7F7F8] h-[930px] select-none">
+
+      <Group justify="space-between" p="lg" style={{  position:"absolute", top:0,right:0, width: "79%" }}>
+      <Group gap="xs">
+        <ActionIcon variant="subtle" size="lg">
+          <IconCloudCancel size={18} color='#403F41'/>
+        </ActionIcon>
+        <ActionIcon variant="subtle" size="lg">
+          <IconArrowBack size={18} color='#403F41'/>
+        </ActionIcon>
+        <ActionIcon variant="subtle" size="lg">
+          <IconArrowForward size={18} color='#403F41'/>
+        </ActionIcon>
+      </Group>
+
+      {/* Center Controls */}
+      <Group gap="xs">
+        <ActionIcon variant="subtle" size="lg">
+          <IconSearch size={18} color='#403F41' />
+        </ActionIcon>
+        <ActionIcon variant="subtle" size="lg">
+          <IconHelpCircle size={18}  color='#403F41'/>
+        </ActionIcon>
+        <Text size="sm" c={"#897E73"}>
+          Save your project for later —{" "}
+          <Anchor href="#" size="sm" underline="always">
+            sign up
+          </Anchor>{" "}
+          or{" "}
+          <Anchor href="#" size="sm" underline="always">
+            log in
+          </Anchor>
+        </Text>
+      </Group>
+
+      {/* Right Buttons */}
+      <Group gap="xs">
+        <Button size="sm" color="orange" radius="md">
+          ⚡ Upgrade
+        </Button>
+        <Button size="sm" color="blue" radius="md">
+        ✓ Done
+        </Button>
+      </Group>
+    </Group>
+
+
       {/* Left Sidebar */}
-      <div className="w-1/4 p-4 space-y-4">
+
+    <Container h={930} w={400} pos={'absolute'} top={0} left={0} bg={"#FFFFFF"} style={{borderLeft: '1px solid #E1E1E3',borderRight: '1px solid #E1E1E3', zIndex: 50}}>
         {/* File Upload */}
-        <div>
-          <Label>Upload Media</Label>
-          <div className="flex items-center">
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              accept="video/*,image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button 
-              variant="outline" 
-              //@ts-ignore
-              onClick={() => fileInputRef.current.click()}
-              className="flex items-center gap-2"
-            >
-              <Upload size={16} /> Select File
-            </Button>
-          </div>
+       
+        <Text fw={600} mt={20} ml={10} size='22px'>Add Media</Text>
+
+        <div className={classes.wrapper}>
+        <Dropzone
+        openRef={openRef}
+        onDrop={(files) => handleFileUpload(files[0])}
+        className={classes.dropzone}
+        radius="md"
+        accept={[MIME_TYPES.mp4, MIME_TYPES.gif, MIME_TYPES.jpeg,MIME_TYPES.png, MIME_TYPES.webp, MIME_TYPES.avif, MIME_TYPES.svg]}
+        maxSize={30 * 1024 ** 2}
+      >
+        <div style={{ pointerEvents: 'none' }}>
+          <Group justify="center">
+            <Dropzone.Accept>
+              <IconDownload size={50}  color={theme.colors.blue[6]} stroke={1.5} />
+            </Dropzone.Accept>
+            <Dropzone.Reject>
+              <IconX size={50} color={theme.colors.red[6]} stroke={1.5} />
+            </Dropzone.Reject>
+            <Dropzone.Idle>
+              <IconCloudUpload className='mt-5' size={30} stroke={1.5} />
+            </Dropzone.Idle>
+          </Group>
+
+          <Text ta="center" fw={700} fz="lg" mt="xl">
+            <Dropzone.Accept>Drop files here</Dropzone.Accept>
+        
+          </Text>
+          <Text ta="center" fz="sm" mt="xs" c="dimmed">
+            Drag&apos;n&apos;drop files here to upload.
+          </Text>
         </div>
+      </Dropzone>
+
+     
+    </div>
 
         {/* Size Inputs */}
         <div className="space-y-2">
-          <Label>Width</Label>
-          <Input
-            type="number"
-            value={size.width}
-            onChange={(e) => setSize(prev => ({ 
-              ...prev, 
-              width: parseInt(e.target.value) || 400 
-            }))}
+  
+          <TextInput
+
+          label='Width'
+          placeholder='Enter Width'
+          onChange={(e) => setSize(prev => ({ 
+            ...prev, 
+            
+            width: parseInt(e.target.value) || 400 
+          }))}
+          value={size.width}
           />
+
         </div>
+
         <div className="space-y-2">
-          <Label>Height</Label>
-          <Input
-            type="number"
-            value={size.height}
-            onChange={(e) => setSize(prev => ({ 
-              ...prev, 
-              height: parseInt(e.target.value) || 300 
-            }))}
+
+        <TextInput
+          label='Height'
+          placeholder='Enter Width'
+          onChange={(e) => setSize(prev => ({ 
+            ...prev, 
+            
+            width: parseInt(e.target.value) || 300 
+          }))}
+          value={size.height}
+          mt={20}
           />
         </div>
 
-        {/* Time Inputs */}
-        <div className="space-y-2">
-          <Label>Start Time (seconds)</Label>
-          <Input
-            type="number"
-            value={startTime}
-            onChange={(e) => setStartTime(parseInt(e.target.value) || 0)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>End Time (seconds)</Label>
-          <Input
-            type="number"
-            value={endTime}
-            onChange={(e) => setEndTime(parseInt(e.target.value) || 10)}
-          />
-        </div>
+      
+      <Group
+      px="md"
+      py="xs"
+      style={{
+        border: "1px solid #dee2e6",
+        borderRadius: rem(8),
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: "50px",
+        userSelect: "none"
+        
+      }}
+    >
+      <Group gap={4}>
+        <ActionIcon variant="subtle" color="gray">
+        <IconClock size="1rem" color='#5C5E65' />
+        </ActionIcon>
+          <Text size='14px' c={'gray'}>Start</Text>
+        <TextInput
+          value={startTime}
+          //@ts-ignore
+          onChange={(e) => setStartTime(parseInt(e.target.value) || 0)}
+          variant="unstyled"
+          size="sm"
+          w={50}
+        />
+      </Group>
 
-        {/* Playback Controls */}
-        <div className="flex gap-2">
-          <Button 
-            onClick={handlePlay} 
-            disabled={!mediaFile || isPlaying}
-          >
-            Play
+      <Divider orientation="vertical" size="xs" />
+
+      <Group gap={4}>
+      <Text size='14px' c={'gray'}>End</Text>
+        <TextInput
+          value={endTime}
+
+          //@ts-ignore
+          onChange={(e) => setEndTime(parseInt(e.target.value) || 0)}
+          variant="unstyled"
+          size="sm"
+          w={50}
+        />
+        <ActionIcon variant="subtle" color="gray">
+          <IconClock size="1rem" color='#5C5E65'/>
+        </ActionIcon>
+      </Group>
+    </Group>
+
+    
+
+     </Container>
+
+     <div style={{ padding: rem(16), borderBottom: "1px solid #ddd" }} className='absolute bottom-0 left-[400px] w-[79%] h-[200px] bg-[white] z-50 select-none'>
+      {/* Toolbar */}
+
+      <Group justify="space-between">
+        <Group gap="xs">
+          <Button variant="subtle"  c={"#2D2C43"} leftSection={<IconScissors size="1rem"  color='#5C5C5D' />}>
+            Split
           </Button>
-          <Button 
-            onClick={handleStop} 
-            disabled={!isPlaying}
-            variant="destructive"
-          >
-            Stop
+          <Button variant="subtle" c={"#2D2C43"} leftSection={<IconDownload size="1rem" color='#5C5C5D'/>}>
+            Download Section <span style={{color:'#5C5C5D', marginLeft:"10px"}}> (0:00 - {endTime})</span>
           </Button>
-        </div>
+        </Group>
 
-        {/* Timer Display */}
-        {isPlaying && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Time</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentTime} seconds
-            </CardContent>
-          </Card>
-        )}
+        {/* Play/Pause Button */}
+
+        <Group gap="xs" mr={200}>
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="black" className="bi bi-skip-backward-fill" viewBox="0 0 16 16">
+       <path d="M.5 3.5A.5.5 0 0 0 0 4v8a.5.5 0 0 0 1 0V8.753l6.267 3.636c.54.313 1.233-.066 1.233-.697v-2.94l6.267 3.636c.54.314 1.233-.065 1.233-.696V4.308c0-.63-.693-1.01-1.233-.696L8.5 7.248v-2.94c0-.63-.692-1.01-1.233-.696L1 7.248V4a.5.5 0 0 0-.5-.5"/>
+        </svg>
+          {isPlaying === false?
+          <svg  onClick={(e)=>{e.stopPropagation(); handlePlay();}} xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" className="bi bi-play-fill" viewBox="0 0 16 16">
+            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/>
+            </svg>:
+
+            <svg onClick={(e)=>{e.stopPropagation(); handleStop();}} xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="black" className="bi bi-pause" viewBox="0 0 16 16">
+            <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5"/>
+            </svg>}
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="black" className="bi bi-fast-forward-fill" viewBox="0 0 16 16">
+             <path d="M7.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C.713 12.69 0 12.345 0 11.692V4.308c0-.653.713-.998 1.233-.696z"/>
+          <path d="M15.596 7.304a.802.802 0 0 1 0 1.392l-6.363 3.692C8.713 12.69 8 12.345 8 11.692V4.308c0-.653.713-.998 1.233-.696z"/>
+          </svg>
+          <Text size="sm" c={" #5C5C5D "} ml={10}>
+            {currentTime.toFixed(1)} / {endTime.toFixed(1)}
+          </Text>
+        </Group>
+
+        {/* Zoom Controls */}
+
+        <Group gap="xs">
+          <IconZoomOut size="1rem" color='#5C5C5D' />
+          <Slider
+            value={zoomLevel}
+            onChange={setZoomLevel}
+            min={10}
+            max={300}
+            styles={{ track: {
+              height: rem(3),
+              backgroundColor: "#A2B0FE",
+              borderRadius: rem(2),
+            },
+            bar: {
+              backgroundColor: "#e0e0e0", 
+              height: rem(2)
+            },
+            thumb: {
+              width: rem(10),
+            
+            
+              height: rem(10), 
+              backgroundColor: "#A2B0FE",
+              border: "1px solid #A2B0FE",
+              borderRadius: "50%", 
+              boxShadow: "0px 0px 4px rgba(0, 0, 0, 0.2)",
+            },}}
+          />
+          <IconZoomIn size="1rem"  color='#5C5C5D'  />
+          <Text size="sm" c={"#5C5C5D"}>Fit</Text>
+        </Group>
+      </Group>
+
+      <Divider my="sm" />
+
+      {/* Timeline */}
+
+      <div style={{ position: "relative", height: rem(50), marginTop: rem(10) }}>
+
+        {/* Seek Bar */}
+
+        <Slider
+          //@ts-ignore
+          value={(currentTime / duration) * 100}
+          //@ts-ignore
+          onChange={(value) => setCurrentTime((value / 100) * duration)}
+          styles={{
+            track: {
+              height: rem(3), 
+              backgroundColor: "#e0e0e0",
+              borderRadius: rem(2),
+            },
+            bar: {
+              backgroundColor: "#e0e0e0", 
+              height: rem(2), 
+            },
+            thumb: {
+              width: rem(2),
+              height: "80px", 
+              backgroundColor: "#5666F5", 
+              border: "1px solid #5666F5",
+              marginTop: "40px",
+              boxShadow: "0px 0px 4px rgba(0, 0, 0, 0.2)",
+            },
+          }}
+        />
+
+        {/* Time Markers */}
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "0.8rem",
+            marginTop: rem(5),
+          }}
+        >
+          {Array.from({ length: (endTime-startTime )<=30?endTime-startTime: 30 }).map((_, i) => (
+            <Text key={i} size="xs">
+              {(endTime-startTime )<=30?i+'s': ''}
+            </Text>
+          ))}
+        </div>
       </div>
+    </div>
 
       {/* Canvas */}
       <div 
         ref={canvasRef}
-        className="w-[60%] h-[600px] bg-[black] relative border-2 border-gray-200"
+        onClick={()=>{setonresize(false)}}
+        className="w-[60%] h-[600px] bg-[black] relative left-[30%] top-[100px] border-2 border-gray-200"
       >
         {mediaFile && (
           <div
@@ -311,9 +528,11 @@ const VideoEditor = () => {
             }}
           >
             {/* Draggable Media Container */}
+
             <div 
               onMouseDown={handleMouseDown}
-              className="w-full h-full relative cursor-move"
+              onClick={(e)=>{setonresize(true); e.stopPropagation()}}
+              className={onresize === false? "w-full h-full relative  hover:border hover:border-[#27A1B2]  ":" border-[#27A1B2] w-full h-full relative  border"}
               style={{ 
                 display: ((isPlaying && currentTime >= startTime && currentTime <= endTime)|| medialoaded === true) ? 'block' : 'none'
               }}
@@ -334,7 +553,7 @@ const VideoEditor = () => {
                 <img
                   ref={mediaRef}
                   src={mediaFile}
-                  className="w-full h-full select-none"
+                  className="w-full h-full  select-none"
                   style={{ 
                     display: ((isPlaying && currentTime >= startTime && currentTime <= endTime)|| medialoaded === true) ? 'block' : 'none'
                   }}
@@ -342,20 +561,21 @@ const VideoEditor = () => {
               )}
 
               {/* Resize Handles */}
+              
               {[
                 'top-left', 'top-right', 
                 'bottom-left', 'bottom-right'
               ].map((direction) => (
                 <div
                   key={direction}
-                  className={`resize-handle absolute w-4 h-4 bg-blue-500 border border-white ${
+                  className={onresize === true?`resize-handle absolute w-3 h-3  rounded-2xl bg-white  ${
                     {
-                      'top-left': 'top-0 left-0 cursor-nwse-resize',
-                      'top-right': 'top-0 right-0 cursor-nesw-resize',
-                      'bottom-left': 'bottom-0 left-0 cursor-nesw-resize',
-                      'bottom-right': 'bottom-0 right-0 cursor-nwse-resize'
+                      'top-left': 'top-[-7px] left-[-7px] cursor-nwse-resize',
+                      'top-right': 'top-[-7px] right-[-7px] cursor-nesw-resize',
+                      'bottom-left': 'bottom-[-7px] left-[-7px] cursor-nesw-resize',
+                      'bottom-right': 'bottom-[-7px] right-[-7px] cursor-nwse-resize'
                     }[direction]
-                  }`}
+                  }`:'none'}
                   onMouseDown={(e) => startResize(direction, e)}
                 />
               ))}
